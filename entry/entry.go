@@ -2,6 +2,7 @@ package entry
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -27,7 +28,8 @@ func NewRoot(path string, showHidden bool) (*Dir, error) {
 }
 
 type Entry interface {
-	Name() string
+	fmt.Stringer
+
 	Path() string
 	IsDir() bool
 	Size() int
@@ -41,7 +43,7 @@ type File struct {
 	depth int
 }
 
-func (f *File) Name() string {
+func (f *File) String() string {
 	return f.name
 }
 
@@ -77,7 +79,7 @@ type Dir struct {
 	showHidden bool
 }
 
-func (d *Dir) Name() string {
+func (d *Dir) String() string {
 	return d.name
 }
 
@@ -184,7 +186,7 @@ func (d *Dir) read() error {
 		if !children[i].IsDir() && children[j].IsDir() {
 			return false
 		}
-		return children[i].Name() < children[j].Name()
+		return children[i].String() < children[j].String()
 	})
 
 	d.children = children

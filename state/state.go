@@ -83,7 +83,7 @@ func (st *state) View() views.CellModel {
 		Depth int
 	}{}
 	_ = st.Root().Walk(func(e entry.Entry) error {
-		name := e.Name()
+		name := e.String()
 		if e, ok := e.(*entry.Dir); ok {
 			if e.IsOpen() {
 				name = "▾ " + name
