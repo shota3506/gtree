@@ -8,11 +8,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+/*
+testdata
+├── a
+│   ├── b
+│   │   ├── sample4.txt
+│   │   └── sample6.txt
+│   ├── c
+│   │   └── sample5.txt
+│   └── sample3.txt
+├── sample1.txt
+└── sample2.txt
+*/
+
 func TestFile(t *testing.T) {
 	root, err := NewRoot("testdata", false)
 	require.NoError(t, err)
 
-	require.Len(t, root.children, 2)
+	require.Len(t, root.children, 3)
 	c := root.children[1]
 
 	f, ok := c.(*File)
@@ -29,7 +42,7 @@ func TestDir(t *testing.T) {
 	root, err := NewRoot("testdata", false)
 	require.NoError(t, err)
 
-	require.Len(t, root.children, 2)
+	require.Len(t, root.children, 3)
 	c := root.children[0]
 
 	d, ok := c.(*Dir)
