@@ -92,9 +92,6 @@ func (d *Dir) IsDir() bool {
 }
 
 func (d *Dir) Size() int {
-	if !d.IsOpen() {
-		return 1
-	}
 	var size int
 	_ = d.Walk(func(e Entry) error { // never return error
 		size += 1
@@ -117,16 +114,6 @@ func (d *Dir) Open() error {
 
 func (d *Dir) Close() {
 	d.open = false
-}
-
-func (d *Dir) Toggle() error {
-	var err error
-	if d.IsOpen() {
-		d.Close()
-	} else {
-		err = d.Open()
-	}
-	return err
 }
 
 func (d *Dir) IsOpen() bool {

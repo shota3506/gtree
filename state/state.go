@@ -9,10 +9,10 @@ import (
 type State interface {
 	View() views.CellModel
 	Root() *entry.Dir
-	Get() (entry.Entry, error)
 	Up()
 	Down()
 	SetSize(width, height int)
+	Toggle() error
 }
 
 type state struct {
@@ -37,14 +37,6 @@ func (s *state) Root() *entry.Dir {
 	return s.root
 }
 
-func (st *state) Get() (entry.Entry, error) {
-	e, err := st.Root().Get(st.pos)
-	if err != nil {
-		return nil, err
-	}
-	return e, err
-}
-
 func (st *state) Up() {
 	if st.pos > 0 {
 		st.pos -= 1
@@ -66,6 +58,24 @@ func (st *state) SetSize(width, height int) {
 	st.height = height
 
 	st.adjust()
+}
+
+func (st *state) Toggle() error {
+	e, err := st.Root().Get(st.pos)
+	if err != nil {
+		return err
+	}
+
+	if d, ok := e.(*entry.Dir); ok {
+		if d.IsOpen() {
+			d.Close()
+		} else {
+			if err = d.Open(); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (st *state) adjust() {

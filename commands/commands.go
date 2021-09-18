@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"github.com/shota3506/gtree/entry"
 	"github.com/shota3506/gtree/state"
 )
 
@@ -36,16 +35,9 @@ func (c CommandResize) Do(st state.State) (state.State, error) {
 type CommandSelect struct{}
 
 func (c CommandSelect) Do(st state.State) (state.State, error) {
-	e, err := st.Get()
+	err := st.Toggle()
 	if err != nil {
 		return nil, err
-	}
-
-	if d, ok := e.(*entry.Dir); ok {
-		err := d.Toggle()
-		if err != nil {
-			return nil, err
-		}
 	}
 	return st, nil
 }
