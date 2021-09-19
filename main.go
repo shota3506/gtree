@@ -123,18 +123,18 @@ func handleCommand(s tcell.Screen, commandChan chan commands.Command) {
 
 func handleChange(s tcell.Screen, stateChan chan state.State) {
 	for {
-		state, ok := <-stateChan
+		st, ok := <-stateChan
 		if !ok {
 			return
 		}
-		render(s, state)
+		render(s, st)
 	}
 }
 
 func start(s tcell.Screen, root *entry.Dir, commandChan chan commands.Command, stateChan chan state.State) {
 	width, height := s.Size()
-	state := state.NewState(root, width, height-1)
-	stateChan <- state
+	var st state.State = state.NewState(root, width, height-1)
+	stateChan <- st
 
 	for {
 		command, ok := <-commandChan
@@ -142,9 +142,9 @@ func start(s tcell.Screen, root *entry.Dir, commandChan chan commands.Command, s
 			close(stateChan)
 			return
 		}
-		if nextState, err := command.Do(state); err == nil {
-			state = nextState
-			stateChan <- state
+		if next, err := command.Do(st); err == nil {
+			st = next
+			stateChan <- st
 		}
 	}
 }

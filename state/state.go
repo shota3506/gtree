@@ -23,7 +23,7 @@ type state struct {
 	height int
 }
 
-func NewState(root *entry.Dir, width, height int) State {
+func NewState(root *entry.Dir, width, height int) *state {
 	return &state{
 		root:   root,
 		pos:    0,
@@ -88,10 +88,12 @@ func (st *state) adjust() {
 }
 
 func (st *state) View() views.CellModel {
-	items := []*struct {
+	type item struct {
 		Name  string
 		Depth int
-	}{}
+	}
+
+	items := []*item{}
 	_ = st.Root().Walk(func(e entry.Entry) error {
 		name := e.String()
 		if e, ok := e.(*entry.Dir); ok {
@@ -102,18 +104,12 @@ func (st *state) View() views.CellModel {
 			}
 		}
 
-		items = append(items, &struct {
-			Name  string
-			Depth int
-		}{
-			Name:  name,
-			Depth: e.Depth(),
-		})
+		items = append(items, &item{Name: name, Depth: e.Depth()})
 		return nil
 	})
 
 	m := map[int]interface{}{}
-	lines := []*ViewLine{}
+	lines := []*viewLine{}
 	for i := len(items) - 1; i >= 0; i-- {
 		prefix := ""
 		for j := 0; j < items[i].Depth-1; j++ {
@@ -136,7 +132,7 @@ func (st *state) View() views.CellModel {
 			style = style.Reverse(true)
 		}
 
-		lines = append([]*ViewLine{{prefix + items[i].Name, style}}, lines...)
+		lines = append([]*viewLine{{prefix + items[i].Name, style}}, lines...)
 		m[items[i].Depth] = struct{}{}
 		if i < len(items)-1 {
 			for depth := items[i].Depth + 1; depth <= items[i+1].Depth; depth++ {
@@ -153,7 +149,7 @@ func (st *state) View() views.CellModel {
 }
 
 type viewState struct {
-	lines  []*ViewLine
+	lines  []*viewLine
 	width  int
 	height int
 }
@@ -183,15 +179,15 @@ func (v *viewState) SetCursor(int, int) {}
 
 func (v *viewState) MoveCursor(offx, offy int) {}
 
-type ViewLine struct {
+type viewLine struct {
 	text  string
 	style tcell.Style
 }
 
-func (l *ViewLine) String() string {
+func (l *viewLine) String() string {
 	return l.text
 }
 
-func (l *ViewLine) Style() tcell.Style {
+func (l *viewLine) Style() tcell.Style {
 	return l.style
 }
